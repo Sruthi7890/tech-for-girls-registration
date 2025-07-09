@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tech For Girls Registration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #ffe4e1, #ffdee9);
+      margin: 0;
+      padding: 20px;
+      animation: fadeIn 1s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      animation: popIn 0.5s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    h2 {
+      text-align: center;
+      color: #e75480;
+      margin-bottom: 20px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    input:focus, select:focus {
+      border-color: #e75480;
+      outline: none;
+      box-shadow: 0 0 5px #ffc0cb;
+    }
+    button {
+      background-color: #e75480;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover:not(:disabled) {
+      background-color: #d9426c;
+    }
+    button:disabled {
+      background-color: grey;
+      cursor: not-allowed;
+    }
+    #finalMessage {
+      text-align: center;
+      color: green;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    #logo {
+      width: 100px;
+      display: block;
+      margin: 0 auto 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135789.png" alt="logo" id="logo" />
+    <h2>Tech For Girls Registration</h2>
+    <form id="registrationForm">
+      <input type="text" id="name" placeholder="Full Name" required />
+      <input type="number" id="phone" placeholder="Phone Number" required />
+      <input type="email" id="email" placeholder="Email Address" required />
+      <select id="college" required>
+        <option value="">Select College/Department</option>
+        <option value="CSE">CSE</option>
+        <option value="ECE">ECE</option>
+        <option value="EEE">EEE</option>
+        <option value="IT">IT</option>
+      </select>
+
+      <button type="button" id="shareBtn"><i class="fab fa-whatsapp"></i> Share on WhatsApp</button>
+      <p id="counterText">Click Count: 0/5</p>
+
+      <input type="file" id="fileInput" required />
+      <button type="submit" id="submitBtn" disabled>Submit Registration</button>
+    </form>
+    <p id="finalMessage"></p>
+  </div>
+
+  <script>
+    const shareBtn = document.getElementById("shareBtn");
+    const counterText = document.getElementById("counterText");
+    const submitBtn = document.getElementById("submitBtn");
+    const form = document.getElementById("registrationForm");
+    const finalMessage = document.getElementById("finalMessage");
+
+    let clickCount = localStorage.getItem("shareCount") || 0;
+    let submitted = localStorage.getItem("submitted") || false;
+
+    counterText.innerText = `Click Count: ${clickCount}/5`;
+
+    if (submitted === "true") {
+      form.querySelectorAll("input, select, button").forEach(el => el.disabled = true);
+      finalMessage.innerText = "🎉 Your submission has been recorded. Thanks for being part of Tech for Girls!";
+    }
+
+    shareBtn.addEventListener("click", () => {
+      if (clickCount < 5) {
+        const msg = encodeURIComponent("🌟 Hey! Just found something awesome 👩‍💻✨\nJoin the *Tech For Girls* Community – where learning meets fun! 💡🎉\nLet’s grow together, learn tech, and build cool stuff 💻🔥\nClick here to explore: https://sruthi7890.github.io/tech-for-girls-registration/");
+        window.open(`https://wa.me/?text=${msg}`, "_blank");
+        clickCount++;
+        localStorage.setItem("shareCount", clickCount);
+        counterText.innerText = `Click Count: ${clickCount}/5`;
+
+        if (clickCount == 5) {
+          counterText.innerText += "\nSharing complete. Please continue.";
+          submitBtn.disabled = false;
+        }
+      }
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (clickCount < 5) return alert("Please complete 5 shares first.");
+
+      const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
+      const email = document.getElementById("email").value;
+      const college = document.getElementById("college").value;
+      const file = document.getElementById("fileInput").files[0];
+
+      const fileLink = await uploadFileToDrive(file); // Placeholder, implement properly.
+
+      fetch("https://script.google.com/macros/s/AKfycbyfXwKaDYdnthFctexCRIVE66pGb-h2E5jGwPWKmGsWCbV7uPITgMUP7BQ2QgupBVFr/exec", {
+        method: "POST",
+        body: JSON.stringify({ name, phone, email, college, fileLink }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      localStorage.setItem("submitted", true);
+      form.querySelectorAll("input, select, button").forEach(el => el.disabled = true);
+      finalMessage.innerText = "🎉 Your submission has been recorded. Thanks for being part of Tech for Girls!";
+
+      // Confetti animation (optional fun effect)
+      confetti();
+    });
+
+    async function uploadFileToDrive(file) {
+      return "Uploaded_File_Link_Placeholder";
+    }
+
+    // Optional confetti animation (simplified)
+    function confetti() {
+      const duration = 1 * 1000;
+      const end = Date.now() + duration;
+      const colors = ['#bb0000', '#ffffff'];
+
+      (function frame() {
+        confettiEffect();
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
+    }
+
+    function confettiEffect() {
+      const el = document.createElement('div');
+      el.style.position = 'fixed';
+      el.style.left = Math.random() * 100 + '%';
+      el.style.top = '-10px';
+      el.style.width = '8px';
+      el.style.height = '8px';
+      el.style.background = ['#e75480', '#ffd700', '#8a2be2'][Math.floor(Math.random() * 3)];
+      el.style.opacity = '0.8';
+      el.style.borderRadius = '50%';
+      el.style.animation = 'fall 1s linear';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1000);
+    }
+  </script>
+</body>
+</html>
